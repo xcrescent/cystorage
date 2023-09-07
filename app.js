@@ -53,15 +53,15 @@ var corsOptions = {
     origin: 'http://localhost:3000',
 }
 
-app.use(allowCrossDomain);
+// app.use(allowCrossDomain);
 // app.use(cors(corsOptions));
 
 var apiPrefix = '/api/v1';
 
 app.use(apiPrefix + '/', indexRouter);
 app.use(apiPrefix + '/users', usersRouter);
-app.use(apiPrefix + '/admin', adminRouter);
-
+// app.use(apiPrefix + '/admin', adminRouter);
+app.use(apiPrefix + '/auth', authRoutes);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
