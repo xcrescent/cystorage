@@ -2,8 +2,14 @@ var express = require('express');
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+// Example route: Get all users
+router.get('/', async (req, res, next) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;

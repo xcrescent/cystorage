@@ -4,22 +4,33 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose'); // Import Mongoose
-
+var cors = require('cors');
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const usersRouter = require('./routes/users');
+const adminRouter = require('./routes/admin');
+const authRoutes = require('./routes/auth');
+const fileRoutes = require('./routes/files');
 
 var app = express();
 
-// Connect to your MongoDB database
-mongoose.connect('mongodb://localhost/your-database-name', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+const dbEnv = require("./config").get(process.env.NODE_ENV);
+const url = dbEnv.DATABASE+'nujan-db'+dbEnv.DATABASE_SUFFIX;
+const url2 = 'mongodb+srv://admin:0ohTiFDfaWNnGxnN@cluster0.gu9wqmy.mongodb.net/?retryWrites=true&w=majority';
+
+// Connect to MongoDB
+// mongoose.connect(url, { useNewUrlParser: true });
+mongoose.connect(url2, {useNewUrlParser: true});
+
+mongoose.Promise = global.Promise;
+const db = mongoose.connection;
+db.once('open', _ => {
+  console.log('Database connected:', url);
 });
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', function () {
-  console.log('Connected to the database');
+
+db.on('error', err => {
+  console.error('connection error:', err);
 });
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,8 +42,25 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', '*');
+    next();
+}
+
+var corsOptions = {
+    origin: 'http://localhost:3000',
+}
+
+app.use(allowCrossDomain);
+// app.use(cors(corsOptions));
+
+var apiPrefix = '/api/v1';
+
+app.use(apiPrefix + '/', indexRouter);
+app.use(apiPrefix + '/users', usersRouter);
+app.use(apiPrefix + '/admin', adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

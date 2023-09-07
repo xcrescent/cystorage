@@ -4,17 +4,9 @@ const User = require("../models/user");
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Welcome to Aeronex' });
 });
-// Example route: Get all users
-router.get('/users', async (req, res, next) => {
-  try {
-    const users = await User.find();
-    res.json(users);
-  } catch (error) {
-    next(error);
-  }
-});
+
 
 // Example route: Create a new user
 router.post('/users', async (req, res, next) => {
